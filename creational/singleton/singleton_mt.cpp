@@ -27,12 +27,12 @@ class Singleton {
         // get instance
         static Singleton* Instance();
     protected:
-        static Singleton* get_first ();
-        static Singleton* get_after ();
-
         // constructor
         Singleton();
     private:
+        static Singleton* get_first ();
+        static Singleton* get_after ();
+
         // location of maximum one instance (nullptr otherwise)
         static Singleton* _instance;
 
