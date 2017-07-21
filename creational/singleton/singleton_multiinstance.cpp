@@ -124,7 +124,7 @@ int main () {
     Singleton<int, float>::Instance(1,1.5);
     Singleton<int, float>::Instance(2,2.5);
     Singleton<int, float>::Instance(1,1.5);
-    Singleton<int, float>::Instance(2,2.5);
+    Singleton<int, double>::Instance(2,2.5);
 }
 
 
