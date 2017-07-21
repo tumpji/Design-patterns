@@ -15,7 +15,6 @@
 
 // normal singleton implementation
 
-#include <iostream>
 
 #include <memory>
 
@@ -42,6 +41,12 @@ Singleton* Singleton::Instance() {
     return _instance.get();
 }
 
+
+
+///////////////////// demo ////////////////
+
+#include <iostream>
+
 // constructor
 Singleton::Singleton () {
     std::cout << "Singleton::Singleton()" << std::endl;
@@ -50,9 +55,6 @@ Singleton::Singleton () {
 Singleton::~Singleton () {
     std::cout << "Singleton::~Singleton()" << std::endl;
 }
-
-
-///////////////////// demo ////////////////
 
 int main () {
     Singleton::Instance();
