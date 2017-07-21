@@ -18,12 +18,16 @@
 // instance accepts Singleton::IID - it's 'Instance ID'
 // for each ID creates it's own singleton based on ID
 
-#include <iostream>
 
 #include <map>
 #include <tuple>
 #include <memory>
 
+#define THREAD_SAFE
+
+#ifdef THREAD_SAFE
+    #include <mutex>
+#endif
 
 template<class ...IID>
 class Singleton {
@@ -41,6 +45,10 @@ class Singleton {
         using _TypePtr = std::shared_ptr<Singleton<IID...>>;
 
         static std::map<_TypeID, _TypePtr> _registry; 
+
+#ifdef THREAD_SAFE
+        static std::mutex mtx;
+#endif
 };
 
 template<class ...IID> 
@@ -49,17 +57,28 @@ template<class ...IID>
         typename Singleton<IID...>::_TypePtr 
             >   Singleton<IID...>::_registry;
 
+#ifdef THREAD_SAFE
+template<class ...IID>
+    std::mutex Singleton<IID...>::mtx;
+#endif
+
+
 // get instance
 template<class ...IID>
 Singleton<IID...>* Singleton<IID...>::Instance(IID ... args) {
     auto regptr = _registry.find(std::make_tuple(args...));
-    if ( regptr != _registry.end() ) {
-        // already exists
+
+    if ( regptr != _registry.end() ) // already exists
         return regptr->second.get();
-    }
     else {
+        #ifdef THREAD_SAFE
+        std::lock_guard<std::mutex> lck ( Singleton<IID...>::mtx );
+        // check again with thread lock
+        regptr = _registry.find(std::make_tuple(args...));
+        if ( regptr != _registry.end() )
+            return regptr->second.get();
+        #endif
         // create one
-        //auto i = std::unique_ptr<Singleton<IID...>>(new Singleton(args...));
         auto i = Singleton<IID...>::_TypePtr(new Singleton(args...));
         auto g = std::pair< Singleton<IID...>::_TypeID, Singleton<IID...>::_TypePtr >
                     ( std::make_tuple(args...), i );
@@ -72,6 +91,7 @@ Singleton<IID...>* Singleton<IID...>::Instance(IID ... args) {
 
 /////////////// demo //////////////
 
+#include <iostream>
 
 template<class First>
 void print_all (std::ostream& output, First frst) {
