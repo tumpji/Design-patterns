@@ -13,7 +13,7 @@
 //    You should have received a copy of the GNU General Public License
 //    along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
 
-// It behaves as non-thread safe variant.
+// It behaves like non-thread safe variant.
 // Only difference is that threre is 
 //   only one call to constructor in multithreaded aplications.
 // 
