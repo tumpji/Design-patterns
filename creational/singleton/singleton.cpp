@@ -13,7 +13,7 @@
 //    You should have received a copy of the GNU Lesser General Public License
 //    along with Thread-safe-design-patterns.  If not, see <http://www.gnu.org/licenses/>.
 
-// normal singleton implementation
+// normal singleton implementation (without synchronization)
 
 
 #include <memory>
