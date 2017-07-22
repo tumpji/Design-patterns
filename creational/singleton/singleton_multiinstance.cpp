@@ -35,15 +35,15 @@ class Singleton {
         // get instance of specific IID
         static Singleton<IID...>* Instance (IID...);
 
-        ~Singleton();
     protected:
         // constructor
         Singleton(IID...);
+        ~Singleton();
     private:
         // maps IID to memory location
         using _TypeID  = std::tuple<IID...>;
-//using _TypePtr = std::shared_ptr<Singleton<IID...>>;
         using _TypePtr = std::unique_ptr<Singleton<IID...>>;
+        friend struct std::default_delete<Singleton<IID...>>;
 
         static std::map<_TypeID, _TypePtr> _registry; 
 
