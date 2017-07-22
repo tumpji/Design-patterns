@@ -28,15 +28,15 @@ class Singleton {
         Singleton();
     private:
         // location of maximum one instance (nullptr otherwise)
-        static std::shared_ptr<Singleton> _instance;
+        static std::unique_ptr<Singleton> _instance;
 };
 
-std::shared_ptr<Singleton> Singleton::_instance ( nullptr );
+std::unique_ptr<Singleton> Singleton::_instance ( nullptr );
 
 // get instance
 Singleton* Singleton::Instance() {
     if ( _instance.get() == nullptr ) {
-        _instance = std::shared_ptr<Singleton>(new Singleton);
+        _instance = std::unique_ptr<Singleton>(new Singleton);
     }
     return _instance.get();
 }
