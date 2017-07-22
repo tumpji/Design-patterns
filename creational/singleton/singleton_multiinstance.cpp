@@ -13,7 +13,7 @@
 //    You should have received a copy of the GNU Lesser General Public License
 //    along with Thread-safe-design-patterns.  If not, see <http://www.gnu.org/licenses/>.
 
-// thread UNsafe singleton implementation
+// thread safe singleton implementation
 // only C++14 +  (template varargs)
 // instance accepts Singleton::IID - it's 'Instance ID'
 // for each ID creates it's own singleton based on ID
@@ -69,6 +69,9 @@ template<class ...IID>
 Singleton<IID...>* Singleton<IID...>::Instance(IID ... args) {
     #ifdef THREAD_SAFE
     std::lock_guard<std::mutex> lck ( Singleton<IID...>::mtx );
+    // it's error to search in map and symultaneously add member
+    // can be fixed with producer/consumer
+    // this variant shoud be sufficient for most applications
     #endif
     auto regptr = _registry.find(std::make_tuple(args...));
 
