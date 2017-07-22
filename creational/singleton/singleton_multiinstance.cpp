@@ -66,18 +66,14 @@ template<class ...IID>
 // get instance
 template<class ...IID>
 Singleton<IID...>* Singleton<IID...>::Instance(IID ... args) {
+    #ifdef THREAD_SAFE
+    std::lock_guard<std::mutex> lck ( Singleton<IID...>::mtx );
+    #endif
     auto regptr = _registry.find(std::make_tuple(args...));
 
     if ( regptr != _registry.end() ) // already exists
         return regptr->second.get();
     else {
-        #ifdef THREAD_SAFE
-        std::lock_guard<std::mutex> lck ( Singleton<IID...>::mtx );
-        // check again with thread lock
-        regptr = _registry.find(std::make_tuple(args...));
-        if ( regptr != _registry.end() )
-            return regptr->second.get();
-        #endif
         // create one
         auto i = Singleton<IID...>::_TypePtr(new Singleton(args...));
         auto g = std::pair< Singleton<IID...>::_TypeID, Singleton<IID...>::_TypePtr >
