@@ -22,13 +22,17 @@ class Singleton {
     public:
         // get instance
         static Singleton* Instance();
-        ~Singleton ();
     protected:
         // constructor
         Singleton();
+        // destructor
+        ~Singleton ();
     private:
         // location of maximum one instance (nullptr otherwise)
         static std::unique_ptr<Singleton> _instance;
+
+        // for destructor
+        friend class std::default_delete<Singleton>;
 };
 
 std::unique_ptr<Singleton> Singleton::_instance ( nullptr );
