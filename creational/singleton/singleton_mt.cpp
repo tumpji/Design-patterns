@@ -19,8 +19,8 @@
 // 
 // After constor call there is no difference between standart implementation!
 
-#include <iostream>
 #include <mutex>
+#include <memory>
 
 class Singleton {
     public:
@@ -29,19 +29,23 @@ class Singleton {
     protected:
         // constructor
         Singleton();
+        ~Singleton();
     private:
         static Singleton* get_first ();
         static Singleton* get_after ();
 
-        // location of maximum one instance (nullptr otherwise)
-        static Singleton* _instance;
-
         static Singleton* (*act_behavior) ();
+
+        // location of maximum one instance (nullptr otherwise)
+        static std::unique_ptr<Singleton> _instance;
+
         // mutex for get_first
         static std::mutex mtx;
+
+        friend struct std::default_delete<Singleton>;
 };
 
-Singleton*  Singleton::_instance = nullptr;
+std::unique_ptr<Singleton>  Singleton::_instance = std::unique_ptr<Singleton>(nullptr);
 Singleton*  (*Singleton::act_behavior) () = &Singleton::get_first;
 std::mutex  Singleton::mtx; 
 
@@ -51,16 +55,16 @@ Singleton* Singleton::get_first () {
     std::lock_guard<std::mutex> lck (Singleton::mtx);
 
     if ( _instance == nullptr ) {
-        _instance = new Singleton;
+        _instance = std::unique_ptr<Singleton>(new Singleton);
         act_behavior = &get_after;
     }
-    return _instance;
+    return _instance.get();
 }
 
 // get instance without condition
 Singleton* Singleton::get_after () {
     // get instance after first initialization
-    return _instance;
+    return _instance.get();
 }
 
 // get instance
@@ -68,7 +72,23 @@ Singleton* Singleton::Instance() {
     return (*act_behavior)();
 }
 
+
+
+/////////////////////// demo ///////////////////////
+
+#include <iostream>
+
 // constructor
 Singleton::Singleton () {
     std::cout << "Singleton::Singleton()" << std::endl;
+}
+Singleton::~Singleton () {
+    std::cout << "Singleton::~Singleton()" << std::endl;
+}
+
+int main () {
+    Singleton::Instance();
+    Singleton::Instance();
+    Singleton::Instance();
+    Singleton::Instance();
 }
