@@ -32,7 +32,7 @@ class Singleton {
         static std::unique_ptr<Singleton> _instance;
 
         // for destructor
-        friend class std::default_delete<Singleton>;
+        friend struct std::default_delete<Singleton>;
 };
 
 std::unique_ptr<Singleton> Singleton::_instance ( nullptr );
