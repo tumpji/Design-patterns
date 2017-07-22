@@ -42,7 +42,8 @@ class Singleton {
     private:
         // maps IID to memory location
         using _TypeID  = std::tuple<IID...>;
-        using _TypePtr = std::shared_ptr<Singleton<IID...>>;
+//using _TypePtr = std::shared_ptr<Singleton<IID...>>;
+        using _TypePtr = std::unique_ptr<Singleton<IID...>>;
 
         static std::map<_TypeID, _TypePtr> _registry; 
 
@@ -76,10 +77,13 @@ Singleton<IID...>* Singleton<IID...>::Instance(IID ... args) {
     else {
         // create one
         auto i = Singleton<IID...>::_TypePtr(new Singleton(args...));
+        auto ptr = i.get();
         auto g = std::pair< Singleton<IID...>::_TypeID, Singleton<IID...>::_TypePtr >
-                    ( std::make_tuple(args...), i );
-        _registry.insert( g );
-        return i.get();
+                    ( std::make_tuple(args...), std::move(i) );
+        // i EOL
+        _registry.insert( std::move(g) );
+        // g EOL
+        return ptr;
     }
 }
 
@@ -88,6 +92,7 @@ Singleton<IID...>* Singleton<IID...>::Instance(IID ... args) {
 /////////////// demo //////////////
 
 #include <iostream>
+#include <string>
 
 template<class First>
 void print_all (std::ostream& output, First frst) {
@@ -121,6 +126,7 @@ int main () {
     Singleton<int, float>::Instance(2,2.5);
     Singleton<int, float>::Instance(1,1.5);
     Singleton<int, double>::Instance(2,2.5);
+    Singleton<int, std::string>::Instance(2,"hi");
 }
 
 
