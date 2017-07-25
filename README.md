@@ -1,4 +1,4 @@
-# Thread-safe-design-patterns
+# Design-patterns
 C++ implementation of some design patterns
 
 ## creational
