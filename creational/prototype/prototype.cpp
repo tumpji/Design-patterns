@@ -15,64 +15,80 @@
 
 // normal prototype implementation (without synchronization)
 // threre isn't need for it
+//
+
+#include <memory>
 
 class PrototypeA {
 public:
-    virtual PrototypeA* clone () = 0;
-    virtual void who () = 0;
+    virtual std::shared_ptr<PrototypeA> clone () = 0;
+    virtual void operation () = 0;
 };
 
 class ConcretePrototypeA1 : public PrototypeA {
-    ConcretePrototypeA1 ( const ConcretePrototypeA1& ) {};
 public:
     ConcretePrototypeA1 () {}
-    virtual PrototypeA* clone () { return new ConcretePrototypeA1(*this); }
-    virtual void who ();
+    ConcretePrototypeA1 ( const ConcretePrototypeA1& ) {};
+
+    virtual std::shared_ptr<PrototypeA> clone () { 
+        return std::make_shared<ConcretePrototypeA1>(*this);
+    }
+    virtual void operation ();
 };
 
 class ConcretePrototypeA2 : public PrototypeA {
-    ConcretePrototypeA2 ( const ConcretePrototypeA2& ) {};
 public:
     ConcretePrototypeA2 () {};
-    virtual PrototypeA* clone () { return new ConcretePrototypeA2(*this); }
-    virtual void who ();
+    ConcretePrototypeA2 ( const ConcretePrototypeA2& ) {};
+
+    virtual std::shared_ptr<PrototypeA> clone () { 
+        return std::make_shared<ConcretePrototypeA2>(*this); 
+    }
+    virtual void operation ();
 };
 
 
 class PrototypeB {
 public:
-    virtual PrototypeB* clone () = 0;
-    virtual void who () = 0;
+    virtual std::shared_ptr<PrototypeB> clone () = 0;
+    virtual void operation () = 0;
 };
 
 class ConcretePrototypeB1 : public PrototypeB {
-    ConcretePrototypeB1 ( const ConcretePrototypeB1& ) {};
 public:
     ConcretePrototypeB1 () {}
-    virtual PrototypeB* clone () { return new ConcretePrototypeB1(*this); }
-    virtual void who ();
+    ConcretePrototypeB1 ( const ConcretePrototypeB1& ) {};
+
+    virtual std::shared_ptr<PrototypeB> clone () { 
+        return std::make_shared<ConcretePrototypeB1>(*this); 
+    }
+    virtual void operation ();
 };
 
 class ConcretePrototypeB2 : public PrototypeB {
-    ConcretePrototypeB2 ( const ConcretePrototypeB2& ) {};
 public:
     ConcretePrototypeB2 () {}
-    virtual PrototypeB* clone () { return new ConcretePrototypeB2(*this); }
-    virtual void who ();
+    ConcretePrototypeB2 ( const ConcretePrototypeB2& ) {};
+
+    virtual std::shared_ptr<PrototypeB> clone () { 
+        return std::make_shared<ConcretePrototypeB2>(*this); 
+    }
+    virtual void operation ();
 };
 
 class Factory {
 public:
-    Factory (PrototypeA* a, PrototypeB* b) {
+    Factory (std::shared_ptr<PrototypeA> a, std::shared_ptr<PrototypeB> b) {
         this->a = a; this->b = b;
     }
 
-    virtual PrototypeA* MakeA () { return a->clone(); }
-    virtual PrototypeB* MakeB () { return b->clone(); }
+    virtual std::shared_ptr<PrototypeA> MakeA () { return a->clone(); }
+    virtual std::shared_ptr<PrototypeB> MakeB () { return b->clone(); }
+    // ...
     
 protected:
-    PrototypeA* a;
-    PrototypeB* b;
+    std::shared_ptr<PrototypeA> a;
+    std::shared_ptr<PrototypeB> b;
 };
 
 
@@ -83,29 +99,36 @@ protected:
 
 #include <iostream>
 
-void ConcretePrototypeA1::who() {
+void ConcretePrototypeA1::operation() {
     std::cout << "A1" << std::endl;
 }
-void ConcretePrototypeA2::who() {
+void ConcretePrototypeA2::operation() {
     std::cout << "A2" << std::endl;
 }
-void ConcretePrototypeB1::who() {
+void ConcretePrototypeB1::operation() {
     std::cout << "B1" << std::endl;
 }
-void ConcretePrototypeB2::who() {
+void ConcretePrototypeB2::operation() {
     std::cout << "B2" << std::endl;
 }
 
 
 
 int main () {
-    // memory leak !!!
-    Factory factory ( new ConcretePrototypeA1(/* args ... */), new ConcretePrototypeB2() );
-    factory.MakeA()->who();
-    factory.MakeB()->who();
+    std::cout << "Example 1: (A1, B2)" << std::endl;
+    Factory factory ( 
+            std::make_shared<ConcretePrototypeA1>(/* args ... */), 
+            std::make_shared<ConcretePrototypeB2>() 
+            );
+    factory.MakeA()->operation();
+    factory.MakeB()->operation();
 
-    Factory factory2 ( new ConcretePrototypeA2(), new ConcretePrototypeB1() );
-    factory2.MakeA()->who();
-    factory2.MakeB()->who();
+    std::cout << "Example 2: (A1, B2)" << std::endl;
+    Factory factory2 ( 
+            std::make_shared<ConcretePrototypeA2>(), 
+            std::make_shared<ConcretePrototypeB1>() 
+            );
+    factory2.MakeA()->operation();
+    factory2.MakeB()->operation();
 
 }
