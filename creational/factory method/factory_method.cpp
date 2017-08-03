@@ -13,68 +13,64 @@
 //    You should have received a copy of the GNU Lesser General Public License
 //    along with Design-patterns.  If not, see <http://www.gnu.org/licenses/>.
 
-// normal factory method implementation (without synchronization)
-// threre isn't need for it
+// normal factory method implementation 
 
-struct Product { };
-struct ConcreteProductA : public Product { };
-struct ConcreteProductB : public Product { };
+#include <memory>
+
+struct Product { virtual void who () = 0; };
+struct ConcreteProductA : public Product { void who ();};
+struct ConcreteProductB : public Product { void who ();};
+
+
 
 class Creator {
 public:
-    virtual Product* FactoryMethod () = 0;
+    virtual std::shared_ptr<Product> makeProduct () = 0;
     virtual ~Creator () {}
-
-    /*
-    virtual void operation () = 0;
-    ...
-    */
 };
-
-
 
 class ConcreteCreator1 : public Creator {
 public:
     ConcreteCreator1 () {}
-    virtual Product* FactoryMethod ();
+    virtual std::shared_ptr<Product> makeProduct () {
+        return std::make_shared<ConcreteProductA>(); 
+        // or any other construction of object + init
+    }
 };
 class ConcreteCreator2 : public Creator {
 public:
     ConcreteCreator2 () {}
-    virtual Product* FactoryMethod ();
+    virtual std::shared_ptr<Product> makeProduct () {
+        return std::make_shared<ConcreteProductB>(); 
+    }
 };
+
 
 ////////////// demo ////////////////
 //
 #include <iostream>
 
-Product* ConcreteCreator1::FactoryMethod() {
+void ConcreteProductA::who() {
     std::cout << "Creating A" << std::endl;
-    return new ConcreteProductA;
 }
-Product* ConcreteCreator2::FactoryMethod() {
+void ConcreteProductB::who() {
     std::cout << "Creating B" << std::endl;
-    return new ConcreteProductB;
 }
 
 #include <iostream>
 
 int main () {
-    Creator* a = new ConcreteCreator1;
+    std::unique_ptr< Creator > creator = std::make_unique<ConcreteCreator1>();
 
     for ( int i = 0 ; i < 3; ++i ) {
-        auto t = a->FactoryMethod();
-        delete t;
+        auto t = creator->makeProduct();
+        t->who();
     }
-    delete a;
-    a = nullptr;
 
-    a = new ConcreteCreator2;
+    creator = std::make_unique<ConcreteCreator2>();
 
     for ( int i = 0 ; i < 3; ++i ) {
-        auto t = a->FactoryMethod();
-        delete t;
+        auto t = creator->makeProduct();
+        t->who();
     }
-    delete a;
-    a = nullptr;
 }
